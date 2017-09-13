@@ -56,4 +56,4 @@ jekyll-archives:
 
 exclude:
   - serve.bat
-  - deploy.bat
+  - build.bat
