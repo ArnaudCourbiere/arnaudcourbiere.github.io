@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>/2017/09/11/another-post.html</loc>
+<lastmod>2017-09-11T20:28:00-07:00</lastmod>
+</url>
+<url>
+<loc>/2017/09/12/dumpbin.html</loc>
+<lastmod>2017-09-12T19:32:58-07:00</lastmod>
+</url>
+<url>
+<loc>/404</loc>
+</url>
+<url>
+<loc>/about/</loc>
+</url>
+<url>
+<loc>/archives/</loc>
+</url>
+<url>
+<loc>/</loc>
+</url>
+<url>
+<loc>/categories/windows/</loc>
+</url>
+<url>
+<loc>/categories/tool/</loc>
+</url>
+</urlset>
