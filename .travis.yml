@@ -1,0 +1,14 @@
+language: ruby
+rvm:
+- 2.0.0
+env:
+  global:
+    secure: Y5byEXEUZy+Vph7k5neIiVTPz5u1xqB+MkHu3CZslknW+deBq+j1Vop5/SNlBRUzGmZpxGOgcoDYAvOFQt9NML+tFL0pmwfE45xLEBSBhauGeqCOm7iFdXb45fTOpVVH3a+p06nn79HnvHC87efGADfY1Lw9FdjsUrFV51UfHJ3vsivWbLRicnMNwzlu7QaXRFOqufCL6jE7FmDZqHAjsRczuj1R2mXWBtlJUfb57Ns5OB54TbYTFBaj3jPs4Cg8joF7ibLHGlPHkiwnv42vd7fP4f3atgtDPOMRfnpR4vxkDkX8ShIW6T4hpOlpE1j877fsDII02ykFcjF6jtfiAZfScuAnkYbfvjJLo4X9Nhu/lb5unkY7GePUSnl7JhCRTv9PCCddeW6nY8Fe0dECp0FnfoohnQP3U9WDV1Jeg1eYJ0a30Cuq8jRaSy2bTsyATTcHUwx7rd+nVXfK0IdEc5lXEIifh/Bc8WtGtLzeXzWYzzNG0jsyoYC9/7c6WfV1jWl3WLG7iUySqudmPr9RN4lpu5vUqyexCKrYGoAw52gryf7SY/DBOiXFhrm3/dn+NLj7+n7jYW4dYM8kwSL9CjTa4R+9RHK+geWFBRO90KRDXqoy+NJV+3qbU7k4l3NbNJdqFXn7p4B8kg7/DE6c2NEb30wacm4Q6VpP75Ar0mc=
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: "$GITHUB_TOKEN"
+  local_dir: _site
+  target_branch: master
+  on:
+    branch: source
