@@ -53,3 +53,7 @@ jekyll-archives:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+exclude:
+  - serve.bat
+  - deploy.bat
