@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>What is early z anyway?</title>
+  <meta name="description" content="So, Early Z is the name of my blog, but what excatly is early z? Early z rejection is an optimization technique that enables the GPU to skip execution of the pixel shader if it can accurately determine that the given pixel will be discarded after depth testing. To do so, the GPU does depth testing and updates the dept buffer before the pixel shader. The opposite scenario, where depth testing and buffer updates are done after the pixel shader is called late z.">
+  <meta name="keywords" content="graphics, gpu, early z">
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://localhost:4000/2017/09/13/what-is-early-z-anyway.html">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Early Z" href="http://localhost:4000/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="arnaudcourbiere">
+  <meta name="twitter:title" content="What is early z anyway?">
+  <meta name="twitter:description" content="So, Early Z is the name of my blog, but what excatly is early z? Early z rejection is an optimization technique that enables the GPU to skip execution of the pixel shader if it can accurately deter...">
+  
+    <meta name="twitter:creator" content="arnaudcourbiere">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-32785321-3', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Early Z</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://github.com/arnaudcourbiere">GitHub</a>
+      
+        
+        <a class="page-link" href="https://twitter.com/arnaudcourbiere">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">What is early z anyway?</h1>
+    
+    <p class="post-meta"><time datetime="2017-09-13T22:00:00-07:00" itemprop="datePublished">Sep 13, 2017</time> • 
+  
+  
+    
+      <a href="/categories/graphics/">graphics</a>
+    
+  
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>So, Early Z is the name of my blog, but what excatly is early z?</p>
+
+<p>Early z rejection is an optimization technique that enables the GPU to skip execution of the pixel shader if it can accurately determine that the given pixel will be discarded after depth testing. To do so, the GPU does depth testing and updates the dept buffer before the pixel shader. The opposite scenario, where depth testing and buffer updates are done after the pixel shader is called late z.
+<!--more--></p>
+
+<p>Early z is very interesting because it can allow the GPU to discard a very large number of primitives/pixels.</p>
+
+<p>To use early z, the GPU needs to be sure that pixels that would fail the depth test after the vertex shader, when only the geometry has been processed, <b>will not be visible at the end of the pipeline</b>. For example, if the pixel shader modifies the z value of the pixel it is shading, it could make a previously occluded pixel visible.</p>
+
+<p>Let’s list the ways in which occluded pixels (geometry-wise) could end up visible:</p>
+<ul>
+  <li>Depth testing is disabled (whatever is drawn last is visible)</li>
+  <li>Depth testing is enabled but the depth comparison functions is set to ALWAYS (depth test always passes)</li>
+  <li>Alpha blending is enabled (a pixel that fails the depth test may be visible through another pixel)</li>
+  <li>The pixel shader modifies the z value of the pixel (writes to SV_DEPTH)</li>
+  <li>The pixel shader modifies the stencil buffer (stencil test passes or writes to SV_StencilRef)</li>
+  <li>The pixel shader modifies the MSAA coverage mask (SV_Coverage)</li>
+  <li>The pixel shader kills the pixel using the <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb943995(v=vs.85).aspx">discard</a> statement</li>
+  <li>The pixel shader performs unordered access operations (a pixel shader that fails early depth testing but writes to a UAV still needs to be executed)</li>
+</ul>
+
+<p>Please note that a pixel shader can force early z to be turned on using the <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ff471439%28v=vs.85%29.aspx?f=255&amp;MSPPError=-2147217396">earlydepthstencil</a> <a href="https://msdn.microsoft.com/en-us/library/bb313969(v=xnagamestudio.31).aspx">HLSL attribute</a> but results may be undefined if some of the features mentionned earlier are used.</p>
+
+<p>With early z on, it is useful to render a scene in way that will cause as many pixels as possible to be rejected. <a href="(https://software.intel.com/en-us/articles/early-z-rejection-sample)">This article from Intel</a> shows two such techniques.</p>
+
+<h3 id="additional-resources">Additional Resources</h3>
+<p><a href="https://fgiesen.wordpress.com/2011/07/08/a-trip-through-the-graphics-pipeline-2011-part-7/">A very nice article from Fabian Giesen going more in depth (no pun intended).</a><br />
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/bb509647%28v=vs.85%29.aspx?f=255&amp;MSPPError=-2147217396#System_Value">DirectX System-Value Semantics</a>.<br />
+<a href="http://www.yosoygames.com.ar/wp/2017/02/beware-of-sv_coverage/">More info on SV_Coverage, a seldom documented feature.</a><br /></p>
+
+  </div>
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="http://localhost:4000/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
